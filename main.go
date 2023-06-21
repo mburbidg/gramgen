@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/xml"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -26,19 +27,37 @@ type format struct {
 }
 
 func main() {
-	f, err := os.Open("./bnf/39075_1DIS1-GQL_2023_03_23.bnf.xml")
-	//f, err := os.Open("./bnf/snippet.xml")
+	bnf := flag.String("bnf", "", "path to an XML file containing the bnf rules for GQL")
+	lexer := flag.String("lexer", "GQLLexer.g4", "Path to the generated ANTLR lexer")
+	parser := flag.String("parser", "GQLParser.g4", "Path to the generated ANTLR parser")
+	flag.Parse()
+
+	f, err := os.Open(*bnf)
 	if err != nil {
 		log.Fatalf("error opening xml: %s\n", err)
 	}
+	defer f.Close()
 	r := bufio.NewReader(f)
 	decoder := xml.NewDecoder(r)
+
+	lexerFile, err := os.Create(*lexer)
+	if err != nil {
+		log.Fatalf("error opening lexer output file '%s': %s\n", *lexerFile, err)
+	}
+	defer lexerFile.Close()
+
+	parserFile, err := os.Create(*parser)
+	if err != nil {
+		log.Fatalf("error opening parser output file '%s': %s\n", *parserFile, err)
+	}
+	defer parserFile.Close()
+
 	root := buildTree(decoder)
 	tokens := collectTokens(root)
 	for k, v := range tokens {
 		log.Printf("%s=%s\n", k, v)
 	}
-	generateAntlrGrammar(root, "identifier start", tokens, os.Stdout)
+	generateAntlrGrammar(root, "identifier start", tokens, parserFile)
 }
 
 func buildTree(decoder *xml.Decoder) *node {
