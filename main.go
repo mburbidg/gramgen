@@ -26,10 +26,26 @@ type format struct {
 	indentLevel int
 }
 
+var lexerHeader = `lexer grammar GQLLexer;
+
+options { caseInsensitive = true; }
+
+`
+var parserHeader = `parser grammar GQLParser;
+
+options { tokenVocab = GQLLexer; }
+
+gqlRequest
+   : gqlProgram SEMICOLON? EOF
+   ;
+
+`
+
 func main() {
 	bnf := flag.String("bnf", "", "path to an XML file containing the bnf rules for GQL")
 	lexer := flag.String("lexer", "GQLLexer.g4", "Path to the generated ANTLR lexer")
 	parser := flag.String("parser", "GQLParser.g4", "Path to the generated ANTLR parser")
+	firstScannerProd := flag.String("first-scanner-prod", "character string literal", "The first scanner production")
 	flag.Parse()
 
 	f, err := os.Open(*bnf)
@@ -53,11 +69,11 @@ func main() {
 	defer parserFile.Close()
 
 	root := buildTree(decoder)
-	tokens := collectTokens(root)
+	tokens := generateAntlerLexer(root, *firstScannerProd, lexerFile)
 	for k, v := range tokens {
 		log.Printf("%s=%s\n", k, v)
 	}
-	generateAntlrGrammar(root, "identifier start", tokens, parserFile)
+	generateAntlrParser(root, *firstScannerProd, tokens, parserFile)
 }
 
 func buildTree(decoder *xml.Decoder) *node {
@@ -93,21 +109,60 @@ func buildTree(decoder *xml.Decoder) *node {
 	return nil
 }
 
-func collectTokens(root *node) map[string]string {
+func generateAntlerLexer(root *node, firstScannerProd string, w io.Writer) map[string]string {
+	fmt.Fprintf(w, "%s", lexerHeader)
 	tokens := map[string]string{}
+	skipping := true
 	visitProductions(root, func(node *node) bool {
-		rhs := node.elem[0]
-		if rhs.elem[0].name == "terminalsymbol" {
-			tokens[node.attr["name"]] = tokenize(node.attr["name"])
+		if node.attr["name"] == firstScannerProd {
+			skipping = false
+		}
+		if !skipping {
+			rhs := node.elem[0]
+			switch {
+			case rhs.elem[0].name == "terminalsymbol":
+				token := tokenize(node.attr["name"])
+				tokens[node.attr["name"]] = token
+				fmt.Fprintf(w, "%s\n", token)
+				fmt.Fprintf(w, "   : '%s'\n", rhs.elem[0].value)
+				fmt.Fprintf(w, "   ;\n\n")
+			case node.attr["name"] == "reserved word":
+				keywords(node.elem[0], w)
+			case node.attr["name"] == "pre-reserved word":
+				keywords(node.elem[0], w)
+			case node.attr["name"] == "non-reserved word":
+				keywords(node.elem[0], w)
+			}
 		}
 		return false
 	})
 	return tokens
 }
 
-func generateAntlrGrammar(root *node, firstScannerProduction string, tokens map[string]string, w io.Writer) {
+func keywords(rhs *node, w io.Writer) {
+	if rhs == nil || rhs.name != "rhs" {
+		log.Fatalf("expecting <rhs>, when processing keywords\n")
+	}
+	for _, n := range rhs.elem {
+		if n.name != "alt" {
+			log.Fatalf("expecting '<alt>' node when processing keyword\n")
+		}
+		if len(n.elem) != 1 {
+			log.Fatalf("expecting 1 element node, when processing keyword\n")
+		}
+		if kw := n.elem[0]; kw.name == "kw" {
+			token := tokenize(kw.value)
+			fmt.Fprintf(w, "%s\n", token)
+			fmt.Fprintf(w, "   : '%s'\n", token)
+			fmt.Fprintf(w, "   ;\n\n")
+		}
+	}
+}
+
+func generateAntlrParser(root *node, firstScannerProd string, tokens map[string]string, w io.Writer) {
+	fmt.Fprintf(w, "%s", parserHeader)
 	visitProductions(root, func(node *node) bool {
-		if node.attr["name"] == firstScannerProduction {
+		if node.attr["name"] == firstScannerProd {
 			return true
 		}
 		builder := &strings.Builder{}
