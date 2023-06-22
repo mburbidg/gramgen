@@ -109,7 +109,7 @@ func (gen parserGenerator) BNF(node *node, tokens map[string]string, prefix stri
 }
 
 func (gen parserGenerator) kw(node *node, tokens map[string]string, prefix string, builder *strings.Builder) {
-	builder.WriteString(prefix + node.value)
+	builder.WriteString(prefix + "'" + node.value + "'")
 }
 
 func (gen parserGenerator) opt(node *node, tokens map[string]string, prefix string, builder *strings.Builder) {

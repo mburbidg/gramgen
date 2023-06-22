@@ -18,6 +18,13 @@ type node struct {
 	elem  []*node
 }
 
+func newNode() *node {
+	return &node{
+		attr: map[string]string{},
+		elem: []*node{},
+	}
+}
+
 type format struct {
 	needColon   bool
 	needNewline bool
@@ -26,8 +33,8 @@ type format struct {
 
 func main() {
 	bnf := flag.String("bnf", "", "path to an XML file containing the bnf rules for GQL")
-	lexer := flag.String("lexer", "GQLLexer.g4", "Path to the generated ANTLR lexer")
-	parser := flag.String("parser", "GQLParser.g4", "Path to the generated ANTLR parser")
+	lexer := flag.String("lexer", "parser/GQLLexer.g4", "Path to the generated ANTLR lexer")
+	parser := flag.String("parser", "parser/GQLParser.g4", "Path to the generated ANTLR parser")
 	firstScannerProd := flag.String("first-scanner-prod", "literal", "The first scanner production")
 	flag.Parse()
 
@@ -65,12 +72,11 @@ func buildTree(decoder *xml.Decoder) *node {
 	for token, err := decoder.Token(); err == nil; token, err = decoder.Token() {
 		switch v := token.(type) {
 		case xml.StartElement:
-			n := &node{}
+			n := newNode()
 			if t, ok := s.Top(); ok {
 				t.elem = append(t.elem, n)
 			}
 			s.Push(n)
-			s.MustTop().attr = map[string]string{}
 			s.MustTop().name = v.Name.Local
 			for _, attr := range v.Attr {
 				s.MustTop().attr[attr.Name.Local] = attr.Value
@@ -111,6 +117,7 @@ func indent(builder *strings.Builder, level int) string {
 
 func formatName(name string) string {
 	name = strings.Replace(name, "-", " ", -1)
+	name = strings.Replace(name, "/", " ", -1)
 	words := strings.Split(name, " ")
 	builder := strings.Builder{}
 	for i, w := range words {
@@ -127,10 +134,6 @@ func capitalize(str string) string {
 	runes := []rune(str)
 	runes[0] = unicode.ToUpper(runes[0])
 	return string(runes)
-}
-
-func tokenize(str string) string {
-	return strings.Replace(strings.ToUpper(str), " ", "_", -1)
 }
 
 func punctuation(builder *strings.Builder, format *format) {
