@@ -2,31 +2,6 @@ lexer grammar GQLLexer;
 
 options { caseInsensitive = true; }
 
-LITERAL
-   : SIGNED_NUMERIC_LITERAL
-   | GENERAL_LITERAL
-   ;
-
-GENERAL_LITERAL
-   : PREDEFINED_TYPE_LITERAL
-   | LIST_LITERAL
-   | RECORD_LITERAL
-   ;
-
-PREDEFINED_TYPE_LITERAL
-   : BOOLEAN_LITERAL
-   | CHARACTER_STRING_LITERAL
-   | BYTE_STRING_LITERAL
-   | TEMPORAL_LITERAL
-   | DURATION_LITERAL
-   | NULL_LITERAL
-   ;
-
-UNSIGNED_LITERAL
-   : UNSIGNED_NUMERIC_LITERAL
-   | GENERAL_LITERAL
-   ;
-
 BOOLEAN_LITERAL
    : 'TRUE'
    | 'FALSE'
@@ -305,14 +280,6 @@ NULL_LITERAL
    : 'NULL'
    ;
 
-LIST_LITERAL
-   : LIST_VALUE_CONSTRUCTOR_BY_ENUMERATION
-   ;
-
-RECORD_LITERAL
-   : RECORD_VALUE_CONSTRUCTOR
-   ;
-
 OBJECT_NAME
    : IDENTIFIER
    ;
@@ -421,20 +388,6 @@ BINDING_VARIABLE
    : REGULAR_IDENTIFIER
    ;
 
-TOKEN
-   : NON_DELIMITER_TOKEN
-   | DELIMITER_TOKEN
-   ;
-
-NON_DELIMITER_TOKEN
-   : REGULAR_IDENTIFIER
-   | PARAMETER_NAME
-   | KEY_WORD
-   | UNSIGNED_NUMERIC_LITERAL
-   | BYTE_STRING_LITERAL
-   | MULTISET_ALTERNATION_OPERATOR
-   ;
-
 IDENTIFIER
    : REGULAR_IDENTIFIER
    | DELIMITED_IDENTIFIER
@@ -475,362 +428,8 @@ IDENTIFIER_EXTEND
 	| Sc
 	;
 
-KEY_WORD
-   : RESERVED_WORD
-   | NON_RESERVED_WORD
-   ;
-
-RESERVED_WORD
-   : PRE_RESERVED_WORD
-   | 'ABS'
-   | 'ACOS'
-   | 'ALL'
-   | 'ALL_DIFFERENT'
-   | 'AND'
-   | 'ANY'
-   | 'ARRAY'
-   | 'AS'
-   | 'ASC'
-   | 'ASCENDING'
-   | 'ASIN'
-   | 'AT'
-   | 'ATAN'
-   | 'AVG'
-   | 'BIG'
-   | 'BIGINT'
-   | 'BINARY'
-   | 'BOOL'
-   | 'BOOLEAN'
-   | 'BOTH'
-   | 'BTRIM'
-   | 'BY'
-   | 'BYTE_LENGTH'
-   | 'BYTES'
-   | 'CALL'
-   | 'CASE'
-   | 'CAST'
-   | 'CEIL'
-   | 'CEILING'
-   | 'CHAR_LENGTH'
-   | 'CHARACTER_LENGTH'
-   | 'CHARACTERISTICS'
-   | 'CLOSE'
-   | 'COALESCE'
-   | 'COLLECT_LIST'
-   | 'COMMIT'
-   | 'COPY'
-   | 'COS'
-   | 'COSH'
-   | 'COT'
-   | 'COUNT'
-   | 'CREATE'
-   | 'CURRENT_DATE'
-   | 'CURRENT_GRAPH'
-   | 'CURRENT_PROPERTY_GRAPH'
-   | 'CURRENT_SCHEMA'
-   | 'CURRENT_TIME'
-   | 'CURRENT_TIMESTAMP'
-   | 'CURRENT_USER'
-   | 'DATE'
-   | 'DATETIME'
-   | 'DAY'
-   | 'DEC'
-   | 'DECIMAL'
-   | 'DEGREES'
-   | 'DELETE'
-   | 'DESC'
-   | 'DESCENDING'
-   | 'DETACH'
-   | 'DISTINCT'
-   | 'DOUBLE'
-   | 'DROP'
-   | 'DURATION'
-   | 'DURATION_BETWEEN'
-   | 'ELEMENT_ID'
-   | 'ELSE'
-   | 'END'
-   | 'EXCEPT'
-   | 'EXISTS'
-   | 'EXP'
-   | 'FALSE'
-   | 'FILTER'
-   | 'FINISH'
-   | 'FLOAT'
-   | 'FLOAT16'
-   | 'FLOAT32'
-   | 'FLOAT64'
-   | 'FLOAT128'
-   | 'FLOAT256'
-   | 'FLOOR'
-   | 'FOR'
-   | 'FROM'
-   | 'GROUP'
-   | 'HAVING'
-   | 'HOME_GRAPH'
-   | 'HOME_PROPERTY_GRAPH'
-   | 'HOME_SCHEMA'
-   | 'HOUR'
-   | 'IF'
-   | 'IN'
-   | 'INSERT'
-   | 'INT'
-   | 'INTEGER'
-   | 'INT8'
-   | 'INTEGER8'
-   | 'INT16'
-   | 'INTEGER16'
-   | 'INT32'
-   | 'INTEGER32'
-   | 'INT64'
-   | 'INTEGER64'
-   | 'INT128'
-   | 'INTEGER128'
-   | 'INT256'
-   | 'INTEGER256'
-   | 'INTERSECT'
-   | 'INTERVAL'
-   | 'IS'
-   | 'LEADING'
-   | 'LEFT'
-   | 'LET'
-   | 'LIKE'
-   | 'LIMIT'
-   | 'LIST'
-   | 'LN'
-   | 'LOCAL'
-   | 'LOCAL_DATETIME'
-   | 'LOCAL_TIME'
-   | 'LOCAL_TIMESTAMP'
-   | 'LOG'
-   | 'LOG10'
-   | 'LOWER'
-   | 'LTRIM'
-   | 'MATCH'
-   | 'MAX'
-   | 'MIN'
-   | 'MINUTE'
-   | 'MOD'
-   | 'MONTH'
-   | 'NEXT'
-   | 'NODETACH'
-   | 'NORMALIZE'
-   | 'NOT'
-   | 'NULL'
-   | 'NULLS'
-   | 'NULLIF'
-   | 'OCTET_LENGTH'
-   | 'OF'
-   | 'OFFSET'
-   | 'OPTIONAL'
-   | 'OR'
-   | 'ORDER'
-   | 'OTHERWISE'
-   | 'PARAMETER'
-   | 'PARAMETERS'
-   | 'PATH'
-   | 'PATH_LENGTH'
-   | 'PATHS'
-   | 'PERCENTILE_CONT'
-   | 'PERCENTILE_DISC'
-   | 'POWER'
-   | 'PRECISION'
-   | 'PROPERTY_EXISTS'
-   | 'RADIANS'
-   | 'REAL'
-   | 'RECORD'
-   | 'REMOVE'
-   | 'REPLACE'
-   | 'RESET'
-   | 'RETURN'
-   | 'RIGHT'
-   | 'ROLLBACK'
-   | 'RTRIM'
-   | 'SAME'
-   | 'SCHEMA'
-   | 'SECOND'
-   | 'SELECT'
-   | 'SESSION'
-   | 'SET'
-   | 'SIGNED'
-   | 'SIN'
-   | 'SINH'
-   | 'SKIP'
-   | 'SMALL'
-   | 'SMALLINT'
-   | 'SQRT'
-   | 'START'
-   | 'STDDEV_POP'
-   | 'STDDEV_SAMP'
-   | 'STRING'
-   | 'SUM'
-   | 'TAN'
-   | 'TANH'
-   | 'THEN'
-   | 'TIME'
-   | 'TIMESTAMP'
-   | 'TRAILING'
-   | 'TRIM'
-   | 'TRUE'
-   | 'TYPED'
-   | 'UBIGINT'
-   | 'UINT'
-   | 'UINT8'
-   | 'UINT16'
-   | 'UINT32'
-   | 'UINT64'
-   | 'UINT128'
-   | 'UINT256'
-   | 'UNION'
-   | 'UNKNOWN'
-   | 'UNSIGNED'
-   | 'UPPER'
-   | 'USE'
-   | 'USMALLINT'
-   | 'VALUE'
-   | 'VARBINARY'
-   | 'VARCHAR'
-   | 'VARIABLE'
-   | 'WHEN'
-   | 'WHERE'
-   | 'WITH'
-   | 'XOR'
-   | 'YEAR'
-   | 'YIELD'
-   | 'ZONED'
-   | 'ZONED_DATETIME'
-   | 'ZONED_TIME'
-   ;
-
-PRE_RESERVED_WORD
-   : 'AGGREGATE'
-   | 'AGGREGATES'
-   | 'ALTER'
-   | 'CATALOG'
-   | 'CLEAR'
-   | 'CLONE'
-   | 'CONSTRAINT'
-   | 'CURRENT_ROLE'
-   | 'DATA'
-   | 'DIRECTORY'
-   | 'EXACT'
-   | 'EXISTING'
-   | 'FUNCTION'
-   | 'GQLSTATUS'
-   | 'GRANT'
-   | 'INSTANT'
-   | 'NOTHING'
-   | 'NUMERIC'
-   | 'ON'
-   | 'OPEN'
-   | 'PARTITION'
-   | 'PROCEDURE'
-   | 'PRODUCT'
-   | 'PROJECT'
-   | 'QUERY'
-   | 'RECORDS'
-   | 'REFERENCE'
-   | 'RENAME'
-   | 'REVOKE'
-   | 'SUBSTRING'
-   | 'TEMPORAL'
-   | 'UNIQUE'
-   | 'UNIT'
-   | 'VALUES'
-   ;
-
-NON_RESERVED_WORD
-   : 'ACYCLIC'
-   | 'BINDING'
-   | 'BINDINGS'
-   | 'CONNECTING'
-   | 'DESTINATION'
-   | 'DIFFERENT'
-   | 'DIRECTED'
-   | 'EDGE'
-   | 'EDGES'
-   | 'ELEMENT'
-   | 'ELEMENTS'
-   | 'FIRST'
-   | 'GRAPH'
-   | 'GROUPS'
-   | 'KEEP'
-   | 'LABEL'
-   | 'LABELED'
-   | 'LABELS'
-   | 'LAST'
-   | 'NFC'
-   | 'NFD'
-   | 'NFKC'
-   | 'NFKD'
-   | 'NO'
-   | 'NODE'
-   | 'NORMALIZED'
-   | 'ONLY'
-   | 'ORDINALITY'
-   | 'PROPERTY'
-   | 'READ'
-   | 'RELATIONSHIP'
-   | 'RELATIONSHIPS'
-   | 'REPEATABLE'
-   | 'SHORTEST'
-   | 'SIMPLE'
-   | 'SOURCE'
-   | 'TABLE'
-   | 'TEMP'
-   | 'TO'
-   | 'TRAIL'
-   | 'TRANSACTION'
-   | 'TYPE'
-   | 'UNDIRECTED'
-   | 'VERTEX'
-   | 'WALK'
-   | 'WITHOUT'
-   | 'WRITE'
-   | 'ZONE'
-   ;
-
 MULTISET_ALTERNATION_OPERATOR
    : '|+|'
-   ;
-
-DELIMITER_TOKEN
-   : GQL_SPECIAL_CHARACTER
-   | BRACKET_RIGHT_ARROW
-   | BRACKET_TILDE_RIGHT_ARROW
-   | CHARACTER_STRING_LITERAL
-   | CONCATENATION_OPERATOR
-   | DATE_STRING
-   | DATETIME_STRING
-   | DELIMITED_IDENTIFIER
-   | DOUBLE_COLON
-   | DOUBLE_MINUS_SIGN
-   | DOUBLE_PERIOD
-   | DURATION_STRING
-   | GREATER_THAN_OPERATOR
-   | GREATER_THAN_OR_EQUALS_OPERATOR
-   | LEFT_ARROW
-   | LEFT_ARROW_BRACKET
-   | LEFT_ARROW_TILDE
-   | LEFT_ARROW_TILDE_BRACKET
-   | LEFT_MINUS_RIGHT
-   | LEFT_MINUS_SLASH
-   | LEFT_TILDE_SLASH
-   | LESS_THAN_OPERATOR
-   | LESS_THAN_OR_EQUALS_OPERATOR
-   | MINUS_LEFT_BRACKET
-   | MINUS_SLASH
-   | NOT_EQUALS_OPERATOR
-   | RIGHT_ARROW
-   | RIGHT_BRACKET_MINUS
-   | RIGHT_BRACKET_TILDE
-   | SLASH_MINUS
-   | SLASH_MINUS_RIGHT
-   | SLASH_TILDE
-   | SLASH_TILDE_RIGHT
-   | TILDE_LEFT_BRACKET
-   | TILDE_RIGHT_ARROW
-   | TILDE_SLASH
-   | TIME_STRING
    ;
 
 BRACKET_RIGHT_ARROW
@@ -1211,9 +810,10 @@ GQL_SPECIAL_CHARACTER
    | TILDE
    ;
 
+
 SPACE
-   : ' '
-   ;
+	: ' '
+	;
 
 AMPERSAND
    : '&'
@@ -1349,6 +949,10 @@ fragment ID_Start
 	: [\p{ID_Start}]
 	;
 
+fragment ID_Continue
+	: [\p{ID_Continue}]
+	;
+
 fragment Sc
    : [\p{Sc}]
    ;
@@ -1368,4 +972,40 @@ fragment DoubleQuotedCharacter
 fragment AccentQuotedCharacter
 	: ~[`]
 	;
+
+fragment FF
+   : [\f]
+   ;
+
+fragment RS
+   : [\u001E]
+   ;
+
+fragment GS
+   : [\u001D]
+   ;
+
+fragment FS
+   : [\u001C]
+   ;
+
+fragment CR
+   : [\r]
+   ;
+
+fragment TAB
+   : [\t]
+   ;
+
+fragment LF
+   : [\n]
+   ;
+
+fragment VT
+   : [\u000B]
+   ;
+
+fragment US
+   : [\u001F]
+   ;
 

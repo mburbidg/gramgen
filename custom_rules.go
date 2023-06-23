@@ -96,11 +96,20 @@ OTHER_LANGUAGE_CHARACTER
 	:
 	;
 `,
+	"space": `
+SPACE
+	: ' '
+	;
+`,
 }
 
 var commonRules = `
 fragment ID_Start
 	: [\p{ID_Start}]
+	;
+
+fragment ID_Continue
+	: [\p{ID_Continue}]
 	;
 
 fragment Sc
@@ -122,4 +131,40 @@ fragment DoubleQuotedCharacter
 fragment AccentQuotedCharacter
 ` + "	: ~[`]" + `
 	;
+
+fragment FF
+   : [\f]
+   ;
+
+fragment RS
+   : [\u001E]
+   ;
+
+fragment GS
+   : [\u001D]
+   ;
+
+fragment FS
+   : [\u001C]
+   ;
+
+fragment CR
+   : [\r]
+   ;
+
+fragment TAB
+   : [\t]
+   ;
+
+fragment LF
+   : [\n]
+   ;
+
+fragment VT
+   : [\u000B]
+   ;
+
+fragment US
+   : [\u001F]
+   ;
 `

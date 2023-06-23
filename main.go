@@ -16,6 +16,7 @@ type node struct {
 	attr  map[string]string
 	value string
 	elem  []*node
+	refs  int
 }
 
 func newNode() *node {
@@ -31,11 +32,30 @@ type format struct {
 	indentLevel int
 }
 
+// This is a list of rules that are in the lexical section of the BNF that are
+// actually syntactic rules.
+var ruleExceptions = map[string]bool{
+	"list literal":   true,
+	"record literal": true,
+}
+
+// The rules not used in parsing the GQL Language. They are metadata about the
+// language used in the specification.
+var metaRules = map[string]bool{
+	"token":               true,
+	"non delimiter token": true,
+	"delimiter token":     true,
+	"key word":            true,
+	"reserved word":       true,
+	"non reserved word":   true,
+	"pre reserved word":   true,
+}
+
 func main() {
 	bnf := flag.String("bnf", "", "path to an XML file containing the bnf rules for GQL")
 	lexer := flag.String("lexer", "parser/GQLLexer.g4", "Path to the generated ANTLR lexer")
 	parser := flag.String("parser", "parser/GQLParser.g4", "Path to the generated ANTLR parser")
-	firstScannerProd := flag.String("first-scanner-prod", "literal", "The first scanner production")
+	firstScannerProd := flag.String("first-scanner-prod", "boolean literal", "The first scanner production")
 	flag.Parse()
 
 	f, err := os.Open(*bnf)

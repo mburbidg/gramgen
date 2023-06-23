@@ -23,7 +23,7 @@ func (gen lexerGenerator) generate(root *node, firstScannerProd string, w io.Wri
 		if node.attr["name"] == firstScannerProd {
 			skipping = false
 		}
-		if !skipping {
+		if _, ok := ruleExceptions[node.attr["name"]]; !skipping && !ok {
 			token := gen.tokenize(node.attr["name"])
 			if gen.customRule(node, w) {
 				return false

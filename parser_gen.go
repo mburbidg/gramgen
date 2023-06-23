@@ -21,9 +21,13 @@ type parserGenerator struct{}
 
 func (gen parserGenerator) generate(root *node, firstScannerProd string, tokens map[string]string, w io.Writer) {
 	fmt.Fprintf(w, "%s", parserHeader)
+	scannerRules := false
 	visitProductions(root, func(node *node) bool {
 		if node.attr["name"] == firstScannerProd {
-			return true
+			scannerRules = true
+		}
+		if _, ok := ruleExceptions[node.attr["name"]]; scannerRules && !ok {
+			return false
 		}
 		builder := &strings.Builder{}
 		builder.WriteString(formatName(node.attr["name"]) + "\n")

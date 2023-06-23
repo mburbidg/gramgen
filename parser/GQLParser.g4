@@ -2091,12 +2091,12 @@ property_existsPredicate
    ;
 
 valueSpecification
-   : LITERAL
+   : literal
    | parameterValueSpecification
    ;
 
 unsignedValueSpecification
-   : UNSIGNED_LITERAL
+   : unsignedLiteral
    | parameterValueSpecification
    ;
 
@@ -2835,5 +2835,38 @@ element_idFunction
 
 letValueExpression
    : 'LET' letVariableDefinitionList 'IN' valueExpression 'END'
+   ;
+
+literal
+   : SIGNED_NUMERIC_LITERAL
+   | generalLiteral
+   ;
+
+generalLiteral
+   : predefinedTypeLiteral
+   | listLiteral
+   | recordLiteral
+   ;
+
+predefinedTypeLiteral
+   : BOOLEAN_LITERAL
+   | CHARACTER_STRING_LITERAL
+   | BYTE_STRING_LITERAL
+   | TEMPORAL_LITERAL
+   | DURATION_LITERAL
+   | NULL_LITERAL
+   ;
+
+unsignedLiteral
+   : UNSIGNED_NUMERIC_LITERAL
+   | generalLiteral
+   ;
+
+listLiteral
+   : listValueConstructorByEnumeration
+   ;
+
+recordLiteral
+   : recordValueConstructor
    ;
 
